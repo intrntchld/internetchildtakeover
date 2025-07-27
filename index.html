@@ -1,43 +1,4 @@
-<script type="text/javascript">
-        var gk_isXlsx = false;
-        var gk_xlsxFileLookup = {};
-        var gk_fileData = {};
-        function filledCell(cell) {
-          return cell !== '' && cell != null;
-        }
-        function loadFileData(filename) {
-        if (gk_isXlsx && gk_xlsxFileLookup[filename]) {
-            try {
-                var workbook = XLSX.read(gk_fileData[filename], { type: 'base64' });
-                var firstSheetName = workbook.SheetNames[0];
-                var worksheet = workbook.Sheets[firstSheetName];
-
-                // Convert sheet to JSON to filter blank rows
-                var jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, blankrows: false, defval: '' });
-                // Filter out blank rows (rows where all cells are empty, null, or undefined)
-                var filteredData = jsonData.filter(row => row.some(filledCell));
-
-                // Heuristic to find the header row by ignoring rows with fewer filled cells than the next row
-                var headerRowIndex = filteredData.findIndex((row, index) =>
-                  row.filter(filledCell).length >= filteredData[index + 1]?.filter(filledCell).length
-                );
-                // Fallback
-                if (headerRowIndex === -1 || headerRowIndex > 25) {
-                  headerRowIndex = 0;
-                }
-
-                // Convert filtered JSON back to CSV
-                var csv = XLSX.utils.aoa_to_sheet(filteredData.slice(headerRowIndex)); // Create a new sheet from filtered array of arrays
-                csv = XLSX.utils.sheet_to_csv(csv, { header: 1 });
-                return csv;
-            } catch (e) {
-                console.error(e);
-                return "";
-            }
-        }
-        return gk_fileData[filename] || "";
-        }
-        </script><!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -58,6 +19,8 @@
             top: 0;
             left: 0;
             z-index: -1;
+            width: 100%;
+            height: 100%;
         }
         .container {
             position: relative;
@@ -156,6 +119,31 @@
             80% { color: #00f; }
             100% { color: #f0f; }
         }
+
+        /* Media queries for mobile responsiveness */
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 1.5em;
+            }
+            .console p {
+                font-size: 0.8em;
+            }
+            .link {
+                font-size: 0.9em;
+            }
+            .console {
+                width: 90%;
+            }
+        }
+
+        @media (max-width: 480px) {
+            h1 {
+                font-size: 1.2em;
+            }
+            .console p {
+                font-size: 0.7em;
+            }
+        }
     </style>
 </head>
 <body>
@@ -178,26 +166,31 @@
         <div id="title-egg" class="hidden-egg" style="color: #0ff;">bass matrix</div>
         <div id="modal" class="modal">
             <div id="timer">Decoding: 10</div>
-            <button class="modal-button" onclick="window.open('https://internetchildmusic.com', '_blank')">Core</button>
+            <button class="modal-button" onclick="window.open('https://www.internetchildmusic.com', '_blank')">Core</button>
             <button class="modal-button" onclick="window.open('https://www.facebook.com/intrntchld', '_blank')">Echo</button>
             <button class="modal-button" onclick="window.open('https://twitter.com/IntrntChld', '_blank')">Pulse</button>
             <button class="modal-button" onclick="window.open('https://soundcloud.com/intrntchld', '_blank')">Sub</button>
-            <button class="modal-button" onclick="window.open('https://www.instagram.com/intrntchld/', '_blank')">Viz</button>
+            <button class="modal-button" onclick="window.open('https://instagram.com/internet_child_/', '_blank')">Viz</button>
         </div>
     </div>
+
     <script>
-        // matrix rain with 101010
+        // Matrix rain with 101010 - full width and height
         try {
             const canvas = document.getElementById('canvas');
             const ctx = canvas.getContext('2d');
             if (!ctx) throw new Error('Canvas context not supported');
-            canvas.height = window.innerHeight;
-            canvas.width = window.innerWidth;
+
+            function resizeCanvas() {
+                canvas.width = window.innerWidth;
+                canvas.height = window.innerHeight;
+            }
+            resizeCanvas();
 
             const chars = '101010';
             const fontSize = 12;
-            const columns = Math.floor(canvas.width / fontSize);
-            const drops = new Array(columns).fill(0).map(() => Math.random() * canvas.height / fontSize);
+            let columns = Math.floor(canvas.width / fontSize);
+            let drops = Array(columns).fill(0).map(() => Math.random() * canvas.height / fontSize);
 
             function draw() {
                 try {
@@ -219,15 +212,17 @@
             }
 
             setInterval(draw, 30);
+
             window.addEventListener('resize', () => {
-                canvas.height = window.innerHeight;
-                canvas.width = window.innerWidth;
+                resizeCanvas();
+                columns = Math.floor(canvas.width / fontSize);
+                drops = Array(columns).fill(0).map(() => Math.random() * canvas.height / fontSize);
             });
         } catch (e) {
             console.error('Canvas initialization error:', e.message);
         }
 
-        // positive/kid-friendly edm/bass-themed content arrays (enigmatic yet uplifting)
+        // Positive/kid-friendly edm/bass-themed content arrays (enigmatic yet uplifting)
         const quotes = [
             "basslines light the digital path",
             "beats dance in friendly shadows",
@@ -235,6 +230,7 @@
             "rhythms build happy binary worlds",
             "explore the fun sub-bass glow"
         ];
+
         const jokes = [
             "bass dropped? fun glitch ahead",
             "sub hits with a smile code",
@@ -242,6 +238,7 @@
             "why the glow? light bass load",
             "beats play in 101 sunshine"
         ];
+
         const motivations = [
             "build bass dreams with joy",
             "drop fun, rise bright",
@@ -255,18 +252,19 @@
             return array[Math.floor(Math.random() * array.length)];
         }
 
-        // load random content with error handling
+        // Load random content with error handling
         try {
             const quoteEl = document.getElementById('quote');
             const jokeEl = document.getElementById('joke');
             const motivationEl = document.getElementById('motivation');
+
             if (quoteEl) quoteEl.textContent = getRandom(quotes);
             if (jokeEl) jokeEl.textContent = getRandom(jokes);
             if (motivationEl) {
                 const motivationText = getRandom(motivations);
                 motivationEl.textContent = motivationText;
                 if (motivationText === "vibing and thriving") {
-                    // special hidden thing: rainbow animation on title and console
+                    // Special hidden thing: rainbow animation on title and console
                     document.querySelector('h1').classList.add('special-vibe');
                     document.querySelector('.console').classList.add('special-vibe');
                     setTimeout(() => {
@@ -279,7 +277,7 @@
             console.error('Content loading error:', e.message);
         }
 
-        // functions
+        // Functions
         function showEasterEgg() {
             try {
                 const egg = document.getElementById('easter-egg');
@@ -305,7 +303,7 @@
             }
         }
 
-        // random easter egg on load (10% chance)
+        // Random easter egg on load (10% chance)
         try {
             if (Math.random() < 0.1) {
                 showEasterEgg();
@@ -333,13 +331,25 @@
 
         function mainNodeAction() {
             const actions = [
-                () => window.open('https://internetchildmusic.com', '_blank'),
+                () => window.open('https://www.internetchildmusic.com', '_blank'),
                 () => showEasterEgg(),
                 () => window.open(getRandom(['https://soundcloud.com/intrntchld', 'https://open.spotify.com/artist/2GMufAZyrN3DElodGibjh6']), '_blank'),
                 () => alert(getRandom(motivations))
             ];
             getRandom(actions)();
         }
+
+        // Konami code for extra easter egg (kept from previous for added fun)
+        let konamiCode = [38, 38, 40, 40, 37, 39, 37, 39, 66, 65];
+        let userInput = [];
+        document.addEventListener('keydown', (e) => {
+            userInput.push(e.keyCode);
+            if (userInput.length > 10) userInput.shift();
+            if (userInput.toString() === konamiCode.toString()) {
+                document.body.style.color = 'cyan';
+                document.getElementById('motivation').textContent = "Konami unlocked: Extra vibes activated!";
+            }
+        });
     </script>
 </body>
 </html>
