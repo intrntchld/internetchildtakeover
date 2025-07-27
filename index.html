@@ -337,18 +337,19 @@
                 () => alert(getRandom(motivations))
             ];
             getRandom(actions)();
-  // Simplified Easter egg trigger: Press 'i' then 'c' for the same effect
-        let icSequence = [73, 67]; // 73 = 'I' key (uppercase i), 67 = 'C' key (handles both cases as keyCode is uppercase)
+        }
+
+        // Konami code for extra easter egg (kept from previous for added fun)
+        let konamiCode = [38, 38, 40, 40, 37, 39, 37, 39, 66, 65];
         let userInput = [];
-        document.addEventListener('keydown', (e) => {
-            userInput.push(e.keyCode);
-            console.log("Key pressed:", e.keyCode); // Debug: Log each key press
-            if (userInput.length > 2) userInput.shift(); // Keep only last 2 keys
-            if (userInput.toString() === icSequence.toString()) {
-                console.log("IC Code activated!"); // Debug: Confirm activation
+      // Temporary debug: Alert on every key press
+document.addEventListener('keydown', (e) => {
+    alert("Key: " + e.keyCode);
+});
+            if (userInput.length > 10) userInput.shift();
+            if (userInput.toString() === konamiCode.toString()) {
                 document.body.style.color = 'cyan';
-                const motivationEl = document.getElementById('motivation');
-                if (motivationEl) motivationEl.textContent = "IC unlocked: Extra vibes activated!";
+                document.getElementById('motivation').textContent = "Konami unlocked: Extra vibes activated!";
             }
         });
     </script>
